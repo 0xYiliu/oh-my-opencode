@@ -114,11 +114,13 @@ export function applyUltraworkModelOverrideOnMessage(
   const override = resolveUltraworkOverride(pluginConfig, inputAgentName, output, sessionID)
   if (!override) return
 
+  if (override.variant) {
+    output.message["variant"] = override.variant
+    output.message["thinking"] = override.variant
+  }
+
   if (!override.providerID || !override.modelID) {
-    if (override.variant) {
-      output.message["variant"] = override.variant
-    }
-    return
+
   }
 
   const targetModel = { providerID: override.providerID, modelID: override.modelID }
@@ -131,10 +133,7 @@ export function applyUltraworkModelOverrideOnMessage(
   if (!messageId) {
     log("[ultrawork-model-override] No message ID found, falling back to direct mutation")
     output.message.model = targetModel
-    if (override.variant) {
-      output.message["variant"] = override.variant
-    }
-    return
+
   }
 
   const fromModel = (output.message.model as { modelID?: string } | undefined)?.modelID ?? "unknown"
